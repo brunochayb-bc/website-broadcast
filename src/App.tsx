@@ -32,6 +32,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { RAW_DATA, COLORS } from './constants';
 import { PeriodFilter, ChartType } from './types';
 import { cn, formatNum } from './lib/utils';
+import WeekendDashboard from './components/WeekendDashboard';
 
 // Register ChartJS components
 ChartJS.register(
@@ -47,6 +48,7 @@ ChartJS.register(
 );
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<'audiencia' | 'weekend'>('audiencia');
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const [chartType, setChartType] = useState<ChartType>('bar');
 
@@ -265,8 +267,8 @@ export default function App() {
     <div className="min-h-screen pb-12">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-200">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
@@ -274,45 +276,74 @@ export default function App() {
               broadcast<span className="text-indigo-600">.com.br</span>
             </h1>
           </div>
-          <div className="hidden sm:block text-sm text-slate-500 font-medium">
+
+          {/* New navigation / tab switcher menu */}
+          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/40">
+            <button
+              onClick={() => setActiveTab('audiencia')}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200",
+                activeTab === 'audiencia'
+                  ? "bg-white text-indigo-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800 font-semibold"
+              )}
+            >
+              Audiência Geral
+            </button>
+            <button
+              onClick={() => setActiveTab('weekend')}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200",
+                activeTab === 'weekend'
+                  ? "bg-white text-indigo-600 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800 font-semibold"
+              )}
+            >
+              Broadcast Weekend
+            </button>
+          </div>
+
+          <div className="hidden lg:block text-xs text-slate-400 font-medium whitespace-nowrap">
             Relatório de Performance 2025/26
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 mt-8 space-y-8">
-        {/* Period Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Visão Geral</h2>
-            <p className="text-sm text-slate-500">Métricas consolidadas de tráfego e engajamento.</p>
-          </div>
-          <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-            <label htmlFor="periodFilter" className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-2">
-              Período:
-            </label>
-            <select
-              id="periodFilter"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value as PeriodFilter)}
-              className="bg-slate-50 border-none text-sm font-semibold text-indigo-600 focus:ring-0 cursor-pointer rounded-lg px-3 py-1.5 outline-none"
-            >
-              <optgroup label="Comparações">
-                <option value="all">Tudo (Série Histórica)</option>
-                <option value="3months">Últimos 3 Meses</option>
-                <option value="2025">Ano de 2025</option>
-                <option value="2026">Ano de 2026</option>
-              </optgroup>
-              <optgroup label="Meses Individuais">
-                {RAW_DATA.labels.map((label) => (
-                  <option key={label} value={label}>
-                    {label}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
-          </div>
-        </div>
+        {activeTab === 'audiencia' ? (
+          <>
+            {/* Period Selector */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 font-sans">Visão Geral</h2>
+                <p className="text-sm text-slate-500">Métricas consolidadas de tráfego e engajamento do site principal.</p>
+              </div>
+              <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+                <label htmlFor="periodFilter" className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-2">
+                  Período:
+                </label>
+                <select
+                  id="periodFilter"
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value as PeriodFilter)}
+                  className="bg-slate-50 border-none text-sm font-semibold text-indigo-600 focus:ring-0 cursor-pointer rounded-lg px-3 py-1.5 outline-none font-sans"
+                >
+                  <optgroup label="Comparações">
+                    <option value="all">Tudo (Série Histórica)</option>
+                    <option value="3months">Últimos 3 Meses</option>
+                    <option value="2025">Ano de 2025</option>
+                    <option value="2026">Ano de 2026</option>
+                  </optgroup>
+                  <optgroup label="Meses Individuais">
+                    {RAW_DATA.labels.map((label) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+            </div>
 
         {/* PageView Growth Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -438,6 +469,10 @@ export default function App() {
             </table>
           </div>
         </motion.div>
+          </>
+        ) : (
+          <WeekendDashboard />
+        )}
       </main>
     </div>
   );
