@@ -262,7 +262,7 @@ export default function WeekendDashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-800">Tabela de Dados Consolidada (Newsletter)</h3>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded">Newsletter Weekend</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded">Broadcast Weekend</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">

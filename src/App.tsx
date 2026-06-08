@@ -51,6 +51,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'audiencia' | 'weekend'>('audiencia');
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const [chartType, setChartType] = useState<ChartType>('bar');
+  const [isTableExpanded, setIsTableExpanded] = useState(false);
 
   // Filtered data logic
   const filteredData = useMemo(() => {
@@ -442,32 +443,62 @@ export default function App() {
           transition={{ delay: 0.1 }}
           className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8"
         >
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-800">Detalhamento Mensal</h2>
-            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Tabela de Dados Brutos</div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-tighter">
-                  <th className="px-6 py-4">Mês</th>
-                  <th className="px-6 py-4">Usuários</th>
-                  <th className="px-6 py-4">Sessões</th>
-                  <th className="px-6 py-4">Page Views</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {RAW_DATA.labels.map((label, i) => (
-                  <tr key={label} className="hover:bg-slate-50 transition-colors group">
-                    <td className="px-6 py-4 font-medium text-slate-700">{label}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatNum(RAW_DATA.users[i])}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatNum(RAW_DATA.sessions[i])}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatNum(RAW_DATA.pages[i])}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <button 
+            onClick={() => setIsTableExpanded(!isTableExpanded)}
+            className="w-full p-6 flex items-center justify-between hover:bg-slate-50/50 transition-colors text-left outline-none"
+          >
+            <div>
+              <h2 className="text-lg font-bold text-slate-800 font-sans flex items-center gap-2">
+                Detalhamento Mensal
+                <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                  {isTableExpanded ? 'Recolher' : 'Expandir'}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">Visualizar tabela completa de dados brutos mensais</p>
+            </div>
+            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/60 text-slate-400 group-hover:text-indigo-600 transition-all">
+              {isTableExpanded ? (
+                <ChevronUp className="w-5 h-5 text-indigo-600" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-slate-500" />
+              )}
+            </div>
+          </button>
+          
+          <AnimatePresence initial={false}>
+            {isTableExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="overflow-hidden border-t border-slate-100"
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-500 font-semibold uppercase tracking-tighter">
+                        <th className="px-6 py-4">Mês</th>
+                        <th className="px-6 py-4">Usuários</th>
+                        <th className="px-6 py-4">Sessões</th>
+                        <th className="px-6 py-4">Page Views</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {RAW_DATA.labels.map((label, i) => (
+                        <tr key={label} className="hover:bg-slate-50 transition-colors group">
+                          <td className="px-6 py-4 font-medium text-slate-700">{label}</td>
+                          <td className="px-6 py-4 text-slate-600 font-mono">{formatNum(RAW_DATA.users[i])}</td>
+                          <td className="px-6 py-4 text-slate-600 font-mono">{formatNum(RAW_DATA.sessions[i])}</td>
+                          <td className="px-6 py-4 text-slate-600 font-mono">{formatNum(RAW_DATA.pages[i])}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
           </>
         ) : (
