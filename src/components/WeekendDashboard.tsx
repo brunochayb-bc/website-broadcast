@@ -178,29 +178,29 @@ export default function WeekendDashboard() {
   return (
     <div className="space-y-8">
       {/* Sub tabs selector */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200/60 pb-px gap-2">
         <button
           onClick={() => setActiveSubTab('newsletter')}
           className={cn(
-            "pb-4 px-6 text-sm font-semibold border-b-2 transition-all flex items-center gap-2",
+            "pb-3 px-5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2 cursor-pointer",
             activeSubTab === 'newsletter'
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-slate-500 hover:text-slate-700"
+              ? "border-slate-800 text-slate-900 font-bold"
+              : "border-transparent text-slate-400 hover:text-slate-700"
           )}
         >
-          <Mail className="w-4 h-4" />
+          <Mail className="w-4 h-4 text-slate-400" />
           Newsletter Broadcast Weekend
         </button>
         <button
           onClick={() => setActiveSubTab('hotsite')}
           className={cn(
-            "pb-4 px-6 text-sm font-semibold border-b-2 transition-all flex items-center gap-2",
+            "pb-3 px-5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all flex items-center gap-2 cursor-pointer",
             activeSubTab === 'hotsite'
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-slate-500 hover:text-slate-700"
+              ? "border-slate-800 text-slate-900 font-bold"
+              : "border-transparent text-slate-400 hover:text-slate-700"
           )}
         >
-          <Globe className="w-4 h-4" />
+          <Globe className="w-4 h-4 text-slate-400" />
           Hotsite Broadcast Weekend
         </button>
       </div>
@@ -218,12 +218,14 @@ export default function WeekendDashboard() {
               value={newsletterStats.totalSent} 
               avg={newsletterStats.avgSent}
               icon={<Mail className="w-5 h-5 text-indigo-600" />}
+              colorClass="border-indigo-700"
             />
             <KPIItem 
               label="E-mails Entregues" 
               value={newsletterStats.totalDelivered} 
               avg={newsletterStats.avgDelivered}
               icon={<CheckCircle className="w-5 h-5 text-teal-600" />}
+              colorClass="border-teal-700"
             />
             <KPIItem 
               label="Taxa Média Abertura" 
@@ -233,6 +235,7 @@ export default function WeekendDashboard() {
               isPercentage
               benchmark="21-25%"
               tooltipText="Fontes: Mailchimp, Brevo, WebFX, Wolf Financial — dados 2025/2026"
+              colorClass="border-amber-600"
             />
             <KPIItem 
               label="Taxa Média Cliques" 
@@ -242,16 +245,17 @@ export default function WeekendDashboard() {
               isPercentage
               benchmark="2,5% - 3,1%"
               tooltipText="Fontes: Mailchimp, Brevo, WebFX, Wolf Financial — dados 2025/2026"
+              colorClass="border-purple-700"
             />
           </div>
 
           {/* Engagement chart */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-800">Engajamento da Newsletter</h3>
-              <p className="text-xs text-slate-500">Evolução percentual semanal da Taxa de Abertura vs. Taxa de Cliques</p>
+              <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Engajamento da Newsletter</h3>
+              <p className="text-xs text-slate-400 mt-1">Evolução percentual semanal da Taxa de Abertura vs. Taxa de Cliques</p>
             </div>
-            <div className="p-6">
+            <div className="p-6 bg-slate-50/10">
               <div className="h-[380px] w-full relative">
                 <Line data={newsletterChartData} options={newsletterChartOptions} />
               </div>
@@ -259,16 +263,19 @@ export default function WeekendDashboard() {
           </div>
 
           {/* Table representing exactly the Newsletter spreadsheet */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">Tabela de Dados Consolidada (Newsletter)</h3>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Planilha de Desempenho</h3>
+                <p className="text-xs text-slate-400 mt-1">Série histórica de envio, distribuição e retorno (métrica por disparo)</p>
+              </div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded">Broadcast Weekend</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
+              <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
-                    <th className="px-6 py-4 font-bold text-[#0f172a]"># Newsletter Broadcast Weekend</th>
+                  <tr className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold font-mono uppercase tracking-wider text-[10px]">
+                    <th className="px-6 py-4 font-bold text-[#0f172a] font-sans text-xs"># Newsletter Broadcast Weekend</th>
                     {NEWSLETTER_DATA.map(item => (
                       <th key={item.date} className="px-6 py-4 text-center">{item.date}</th>
                     ))}
@@ -371,22 +378,24 @@ export default function WeekendDashboard() {
               value={hotsiteStats.totalViews} 
               avg={hotsiteStats.avgViews}
               icon={<Eye className="w-5 h-5 text-purple-600" />}
+              colorClass="border-indigo-700"
             />
             <KPIItem 
               label="Hotsite Usuários Únicos (Total)" 
               value={hotsiteStats.totalUsers} 
               avg={hotsiteStats.avgUsers}
               icon={<Users className="w-5 h-5 text-amber-600" />}
+              colorClass="border-amber-600"
             />
           </div>
 
           {/* Hotsite Chart */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-800">Visualizações vs Usuários Únicos</h3>
-              <p className="text-xs text-slate-500">Relação semanal de audiência no hotsite Broadcast Weekend</p>
+              <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Visualizações vs Usuários Únicos</h3>
+              <p className="text-xs text-slate-400 mt-1">Relação semanal de audiência no hotsite Broadcast Weekend</p>
             </div>
-            <div className="p-6">
+            <div className="p-6 bg-slate-50/10">
               <div className="h-[380px] w-full relative">
                 <Bar data={hotsiteChartData} options={hotsiteChartOptions} />
               </div>
@@ -394,16 +403,19 @@ export default function WeekendDashboard() {
           </div>
 
           {/* Table representing exactly the Hotsite spreadsheet */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">Tabela de Dados Consolidada (Hotsite)</h3>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded">Hotsite Weekend</span>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Tabela de Desempenho do Hotsite</h3>
+                <p className="text-xs text-slate-400 mt-1">Série compilada de tráfego por período de amostragem semanal</p>
+              </div>
+              <span className="text-[10px] uppercase font-bold text-indigo-700 tracking-wider bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200/50 font-mono font-bold">Hotsite Weekend</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
+              <table className="w-full text-left text-xs whitespace-nowrap">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold">
-                    <th className="px-6 py-4 font-bold text-[#0f172a]">Hotsite Weekend</th>
+                  <tr className="bg-slate-50 border-b border-slate-100 text-slate-400 uppercase tracking-wider font-mono text-[10px]">
+                    <th className="px-6 py-4 font-bold text-[#0f172a] font-sans text-xs">Hotsite Weekend</th>
                     {HOTSITE_DATA.map(item => (
                       <th key={item.period} className="px-6 py-4 text-center">{item.period}</th>
                     ))}
@@ -464,44 +476,52 @@ interface KPIItemProps {
   isPercentage?: boolean;
   benchmark?: string;
   tooltipText?: string;
+  colorClass?: string;
 }
 
-function KPIItem({ label, value, avg, icon, isPercentage = false, benchmark, tooltipText }: KPIItemProps) {
+function KPIItem({ label, value, avg, icon, isPercentage = false, benchmark, tooltipText, colorClass = "border-slate-800" }: KPIItemProps) {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+    <div className={cn(
+      "bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between border-t-4 transition-all hover:translate-y-[-2px] duration-200 cursor-default",
+      colorClass
+    )}>
       <div>
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start mb-3">
           <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
-            <h4 className="text-2xl font-bold text-slate-800 mt-2 font-mono">{typeof value === 'number' ? formatNum(value) : value}</h4>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">{label}</p>
+            <h4 className="text-2xl font-extrabold text-slate-900 mt-2 font-mono tracking-tight">
+              {typeof value === 'number' ? formatNum(value) : value}
+            </h4>
           </div>
-          <div className="p-2 bg-slate-50 rounded-xl shrink-0">
+          <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl shrink-0">
             {icon}
           </div>
         </div>
       </div>
       
-      <div className="mt-4 border-t border-slate-50 pt-2.5 text-xs text-slate-400">
-        <div className="flex items-center gap-1.5 justify-between">
+      <div className="mt-4 border-t border-slate-50 pt-3 text-xs text-slate-400">
+        <div className="flex items-center gap-1.5 justify-between font-sans">
           <div className="flex items-center gap-1.5">
             <Info className="w-3.5 h-3.5 text-slate-300 shrink-0" />
             <span>
-              {isPercentage ? avg : (
-                <>Média Semanal: <span className="font-semibold text-slate-600">{typeof avg === 'number' ? formatNum(avg) : avg}</span></>
+              {isPercentage ? (
+                <span className="text-slate-400 font-medium">Frequência: <span className="font-semibold text-slate-600 font-mono">{avg}</span></span>
+              ) : (
+                <>Média Semanal: <span className="font-semibold text-slate-600 font-mono">{typeof avg === 'number' ? formatNum(avg) : avg}</span></>
               )}
             </span>
           </div>
         </div>
         
         {benchmark && (
-          <div className="mt-2 pt-2 border-t border-dashed border-slate-100 flex items-center justify-between gap-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Benchmark:</span>
+          <div className="mt-2.5 pt-2 border-t border-dashed border-slate-100 flex items-center justify-between gap-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Ref. Mercado:</span>
             <div className="relative group/tooltip inline-block">
-              <span className="font-bold text-indigo-600 bg-indigo-50/75 hover:bg-indigo-100/90 transition-colors px-1.5 py-0.5 rounded cursor-help">
+              <span className="font-bold text-amber-700 bg-amber-50 hover:bg-amber-100/90 transition-colors px-1.5 py-0.5 rounded cursor-help font-mono text-[10px] border border-amber-200/50">
                 {benchmark}
               </span>
               {tooltipText && (
-                <div className="absolute bottom-full right-0 mb-2 w-56 p-2.5 bg-slate-900 text-[10px] leading-relaxed text-white rounded-xl shadow-xl border border-slate-800 opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 pointer-events-none z-20 text-center font-sans tracking-normal">
+                <div className="absolute bottom-full right-0 mb-2 w-56 p-2.5 bg-slate-900 text-[10px] leading-relaxed text-slate-100 rounded-xl shadow-xl border border-slate-800 opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 pointer-events-none z-20 text-center font-sans tracking-normal font-normal">
                   {tooltipText}
                   <div className="w-2 h-2 bg-slate-900 rotate-45 absolute top-full right-4 -mt-1 border-r border-b border-slate-800"></div>
                 </div>
