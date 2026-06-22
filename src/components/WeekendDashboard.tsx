@@ -11,7 +11,8 @@ import {
   XOctagon, 
   TrendingUp, 
   Globe,
-  Info
+  Info,
+  Music
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { NEWSLETTER_DATA, HOTSITE_DATA } from '../weekend_constants';
@@ -22,17 +23,20 @@ export default function WeekendDashboard() {
 
   // Calculated Stats
   const newsletterStats = useMemo(() => {
-    const totalSent = NEWSLETTER_DATA.reduce((sum, item) => sum + item.emailsSent, 0);
-    const totalDelivered = NEWSLETTER_DATA.reduce((sum, item) => sum + item.emailsDelivered, 0);
-    const avgOpenRate = NEWSLETTER_DATA.reduce((sum, item) => sum + item.openRate, 0) / NEWSLETTER_DATA.length;
-    const avgClickRate = NEWSLETTER_DATA.reduce((sum, item) => sum + item.clickRate, 0) / NEWSLETTER_DATA.length;
-    const totalOptOut = NEWSLETTER_DATA.reduce((sum, item) => sum + item.optOut, 0);
+    const sentItems = NEWSLETTER_DATA.filter(item => item.emailsSent !== null && item.emailsSent !== undefined);
+    const activeCount = sentItems.length || 1;
+
+    const totalSent = sentItems.reduce((sum, item) => sum + (item.emailsSent ?? 0), 0);
+    const totalDelivered = sentItems.reduce((sum, item) => sum + (item.emailsDelivered ?? 0), 0);
+    const avgOpenRate = sentItems.reduce((sum, item) => sum + (item.openRate ?? 0), 0) / activeCount;
+    const avgClickRate = sentItems.reduce((sum, item) => sum + (item.clickRate ?? 0), 0) / activeCount;
+    const totalOptOut = sentItems.reduce((sum, item) => sum + (item.optOut ?? 0), 0);
     
     return {
       totalSent,
-      avgSent: Math.round(totalSent / NEWSLETTER_DATA.length),
+      avgSent: Math.round(totalSent / activeCount),
       totalDelivered,
-      avgDelivered: Math.round(totalDelivered / NEWSLETTER_DATA.length),
+      avgDelivered: Math.round(totalDelivered / activeCount),
       avgOpenRate: Number(avgOpenRate.toFixed(2)),
       avgClickRate: Number(avgClickRate.toFixed(2)),
       totalOptOut
@@ -42,22 +46,30 @@ export default function WeekendDashboard() {
   const hotsiteStats = useMemo(() => {
     const totalViews = HOTSITE_DATA.reduce((sum, item) => sum + item.pageViews, 0);
     const totalUsers = HOTSITE_DATA.reduce((sum, item) => sum + item.users, 0);
+    const totalSpotify = HOTSITE_DATA.reduce((sum, item) => sum + (item.spotify ?? 0), 0);
+    const activeSpotifyDays = HOTSITE_DATA.filter(item => item.spotify !== null && item.spotify !== undefined).length || 1;
     
     return {
       totalViews,
       avgViews: Math.round(totalViews / HOTSITE_DATA.length),
       totalUsers,
-      avgUsers: Math.round(totalUsers / HOTSITE_DATA.length)
+      avgUsers: Math.round(totalUsers / HOTSITE_DATA.length),
+      totalSpotify,
+      avgSpotify: Math.round(totalSpotify / activeSpotifyDays)
     };
   }, []);
 
   // Charts Configs
+  const activeNewsletters = useMemo(() => {
+    return NEWSLETTER_DATA.filter(item => item.emailsSent !== null && item.emailsSent !== undefined);
+  }, []);
+
   const newsletterChartData: ChartData<'line'> = {
-    labels: NEWSLETTER_DATA.map(item => item.date),
+    labels: activeNewsletters.map(item => item.date),
     datasets: [
       {
         label: 'Taxa de Abertura (%)',
-        data: NEWSLETTER_DATA.map(item => item.openRate),
+        data: activeNewsletters.map(item => item.openRate ?? 0),
         borderColor: '#6366f1', // Indigo
         backgroundColor: 'rgba(99, 102, 241, 0.1)',
         borderWidth: 3,
@@ -69,7 +81,7 @@ export default function WeekendDashboard() {
       },
       {
         label: 'Taxa de Cliques (%)',
-        data: NEWSLETTER_DATA.map(item => item.clickRate),
+        data: activeNewsletters.map(item => item.clickRate ?? 0),
         borderColor: '#0d9488', // Teal
         backgroundColor: 'rgba(13, 148, 136, 0.1)',
         borderWidth: 3,
@@ -145,6 +157,15 @@ export default function WeekendDashboard() {
         data: HOTSITE_DATA.map(item => item.users),
         backgroundColor: '#f59e0b', // Amber/Orange
         borderColor: '#f59e0b',
+        borderRadius: 6,
+        barPercentage: 0.5,
+        categoryPercentage: 0.8
+      },
+      {
+        label: 'Cliques Spotify',
+        data: HOTSITE_DATA.map(item => item.spotify ?? 0),
+        backgroundColor: '#1db954', // Spotify Green
+        borderColor: '#1db954',
         borderRadius: 6,
         barPercentage: 0.5,
         categoryPercentage: 0.8
@@ -299,29 +320,34 @@ export default function WeekendDashboard() {
                   <tr className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 font-bold text-[#0f172a]">E-mail enviados</td>
                     {NEWSLETTER_DATA.map(item => (
-                      <td key={item.date} className="px-6 py-4 text-center font-semibold text-[#0f172a] font-mono">{formatNum(item.emailsSent)}</td>
+                      <td key={item.date} className="px-6 py-4 text-center font-semibold text-[#0f172a] font-mono">
+                        {item.emailsSent === null || item.emailsSent === undefined ? '-' : formatNum(item.emailsSent)}
+                      </td>
                     ))}
                   </tr>
                   <tr className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-slate-700">E-mails entregues</td>
                     {NEWSLETTER_DATA.map(item => (
-                      <td key={item.date} className="px-6 py-4 text-center text-slate-600 font-mono">{formatNum(item.emailsDelivered)}</td>
+                      <td key={item.date} className="px-6 py-4 text-center text-slate-600 font-mono">
+                        {item.emailsDelivered === null || item.emailsDelivered === undefined ? '-' : formatNum(item.emailsDelivered)}
+                      </td>
                     ))}
                   </tr>
                   <tr className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-slate-700">Taxa de abertura</td>
                     {NEWSLETTER_DATA.map(item => {
                       // Blue highlights matching spreadsheet
-                      const isHighlighted = item.date === '16/Mai';
+                      const isHighlighted = item.date === '30/Mai';
+                      const hasData = item.openRate !== null && item.openRate !== undefined && item.openCount !== null && item.openCount !== undefined;
                       return (
                         <td 
                           key={item.date} 
                           className={cn(
                             "px-6 py-4 text-center font-mono font-medium",
-                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded" : "text-slate-600"
+                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded font-bold" : "text-slate-600"
                           )}
                         >
-                          {item.openRate.toLocaleString('pt-BR')}% ({formatNum(item.openCount)})
+                          {hasData ? `${item.openRate!.toLocaleString('pt-BR')}% (${formatNum(item.openCount!)})` : '-'}
                         </td>
                       );
                     })}
@@ -331,15 +357,16 @@ export default function WeekendDashboard() {
                     {NEWSLETTER_DATA.map(item => {
                       // Blue highlights matching spreadsheet
                       const isHighlighted = item.date === '23/Mai';
+                      const hasData = item.clickRate !== null && item.clickRate !== undefined && item.clickCount !== null && item.clickCount !== undefined;
                       return (
                         <td 
                           key={item.date} 
                           className={cn(
                             "px-6 py-4 text-center font-mono font-medium",
-                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded" : "text-slate-600"
+                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded font-bold" : "text-slate-600"
                           )}
                         >
-                          {item.clickRate.toLocaleString('pt-BR')}% ({formatNum(item.clickCount)})
+                          {hasData ? `${item.clickRate!.toLocaleString('pt-BR')}% (${formatNum(item.clickCount!)})` : '-'}
                         </td>
                       );
                     })}
@@ -348,7 +375,9 @@ export default function WeekendDashboard() {
                     <td className="px-6 py-4 font-medium text-slate-700">Visualização no Browser</td>
                     {NEWSLETTER_DATA.map(item => (
                       <td key={item.date} className="px-6 py-4 text-center text-slate-600 font-mono">
-                        {item.browserViews === 0 ? '-' : item.browserViews}
+                        {item.browserViews === null || item.browserViews === undefined ? '-' : (
+                          item.browserViews === 0 ? '-' : item.browserViews
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -356,7 +385,9 @@ export default function WeekendDashboard() {
                     <td className="px-6 py-4 font-medium text-slate-700">Opt Out</td>
                     {NEWSLETTER_DATA.map(item => (
                       <td key={item.date} className="px-6 py-4 text-center text-slate-600 font-mono">
-                        {item.optOut === 0 ? '-' : item.optOut}
+                        {item.optOut === null || item.optOut === undefined ? '-' : (
+                          item.optOut === 0 ? '-' : item.optOut
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -372,7 +403,7 @@ export default function WeekendDashboard() {
           className="space-y-8"
         >
           {/* Hotsite KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <KPIItem 
               label="Hotsite Page Views (Total)" 
               value={hotsiteStats.totalViews} 
@@ -387,13 +418,20 @@ export default function WeekendDashboard() {
               icon={<Users className="w-5 h-5 text-amber-600" />}
               colorClass="border-amber-600"
             />
+            <KPIItem 
+              label="Cliques Spotify (Total)" 
+              value={hotsiteStats.totalSpotify} 
+              avg={hotsiteStats.avgSpotify}
+              icon={<Music className="w-5 h-5 text-emerald-600" />}
+              colorClass="border-emerald-600"
+            />
           </div>
 
           {/* Hotsite Chart */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Visualizações vs Usuários Únicos</h3>
-              <p className="text-xs text-slate-400 mt-1">Relação semanal de audiência no hotsite Broadcast Weekend</p>
+              <h3 className="text-lg font-bold text-slate-900 font-sans tracking-tight">Visualizações vs Usuários Únicos vs Spotify</h3>
+              <p className="text-xs text-slate-400 mt-1">Relação semanal de audiência e cliques no Spotify no hotsite Broadcast Weekend</p>
             </div>
             <div className="p-6 bg-slate-50/10">
               <div className="h-[380px] w-full relative">
@@ -432,7 +470,7 @@ export default function WeekendDashboard() {
                           key={item.period} 
                           className={cn(
                             "px-6 py-4 text-center font-mono font-semibold",
-                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded" : "text-slate-600"
+                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded font-bold" : "text-slate-600"
                           )}
                         >
                           {formatNum(item.pageViews)}
@@ -440,7 +478,7 @@ export default function WeekendDashboard() {
                       );
                     })}
                   </tr>
-                  <tr className="hover:bg-slate-50/50 transition-colors border-b border-slate-100">
+                  <tr className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-slate-700">Usuários</td>
                     {HOTSITE_DATA.map(item => {
                       // Blue highlight on 16 a 22 maio matching spreadsheet
@@ -450,10 +488,29 @@ export default function WeekendDashboard() {
                           key={item.period} 
                           className={cn(
                             "px-6 py-4 text-center font-mono font-semibold",
-                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded" : "text-slate-600"
+                            isHighlighted ? "text-indigo-600 bg-indigo-50/30 rounded font-bold" : "text-slate-600"
                           )}
                         >
                           {formatNum(item.users)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  <tr className="hover:bg-slate-50/50 transition-colors border-b border-slate-100">
+                    <td className="px-6 py-4 font-bold text-slate-800">Spotify</td>
+                    {HOTSITE_DATA.map(item => {
+                      // Highlight on 9 a 15 de maio
+                      const isHighlighted = item.period === '9 a 15 maio';
+                      const value = item.spotify;
+                      return (
+                        <td 
+                          key={item.period} 
+                          className={cn(
+                            "px-6 py-4 text-center font-mono font-semibold",
+                            isHighlighted ? "text-emerald-600 bg-emerald-50/30 rounded font-bold" : "text-slate-600"
+                          )}
+                        >
+                          {value === null || value === undefined ? '-' : formatNum(value)}
                         </td>
                       );
                     })}
